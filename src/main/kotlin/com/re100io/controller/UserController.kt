@@ -85,8 +85,58 @@ class UserController(private val userService: UserService) {
     }
 
     @GetMapping("/search")
+    @Operation(summary = "搜索用户", description = "根据关键词搜索用户")
     fun searchUsers(@RequestParam keyword: String): ResponseEntity<ApiResponse<List<UserResponse>>> {
         val users = userService.searchUsers(keyword)
         return ResponseEntity.ok(ApiResponse(true, "搜索用户成功", users))
+    }
+
+    @GetMapping("/advanced-search")
+    @Operation(summary = "高级搜索用户", description = "使用多个条件搜索用户")
+    fun findUsersWithConditions(
+        @RequestParam(required = false) username: String?,
+        @RequestParam(required = false) email: String?,
+        @RequestParam(required = false) isActive: Boolean?,
+        @RequestParam(required = false) limit: Int?
+    ): ResponseEntity<ApiResponse<List<UserResponse>>> {
+        val users = userService.findUsersWithConditions(
+            username = username,
+            email = email,
+            isActive = isActive,
+            limit = limit
+        )
+        return ResponseEntity.ok(ApiResponse(true, "高级搜索成功", users))
+    }
+
+    @PostMapping("/batch")
+    @Operation(summary = "批量创建用户", description = "一次性创建多个用户")
+    fun createUsersInBatch(@Valid @RequestBody requests: List<CreateUserRequest>): ResponseEntity<ApiResponse<List<UserResponse>>> {
+        val users = userService.createUsersInBatch(requests)
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ApiResponse(true, "批量创建用户成功", users))
+    }
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "更新用户状态", description = "激活或禁用用户")
+    fun updateUserStatus(
+        @PathVariable id: Long,
+        @RequestParam isActive: Boolean
+    ): ResponseEntity<ApiResponse<UserResponse>> {
+        val user = userService.updateUserStatus(id, isActive)
+        return ResponseEntity.ok(ApiResponse(true, "用户状态更新成功", user))
+    }
+
+    @GetMapping("/statistics")
+    @Operation(summary = "获取用户统计信息", description = "获取用户数量统计")
+    fun getUserStatistics(): ResponseEntity<ApiResponse<Map<String, Any>>> {
+        val statistics = userService.getUserStatistics()
+        return ResponseEntity.ok(ApiResponse(true, "获取统计信息成功", statistics))
+    }
+
+    @PostMapping("/by-ids")
+    @Operation(summary = "根据ID列表获取用户", description = "批量获取指定ID的用户信息")
+    fun findUsersByIds(@RequestBody ids: List<Long>): ResponseEntity<ApiResponse<List<UserResponse>>> {
+        val users = userService.findUsersByIds(ids)
+        return ResponseEntity.ok(ApiResponse(true, "批量获取用户成功", users))
     }
 }

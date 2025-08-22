@@ -84,6 +84,63 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.searchUsers(keyword).map { mapToUserResponse(it) }
     }
 
+    @Transactional(readOnly = true)
+    fun findUsersWithConditions(
+        username: String? = null,
+        email: String? = null,
+        isActive: Boolean? = null,
+        startDate: LocalDateTime? = null,
+        endDate: LocalDateTime? = null,
+        limit: Int? = null
+    ): List<UserResponse> {
+        return userRepository.findUsersWithConditions(
+            username, email, isActive, startDate, endDate, limit
+        ).map { mapToUserResponse(it) }
+    }
+
+    fun createUsersInBatch(requests: List<CreateUserRequest>): List<UserResponse> {
+        val users = requests.map { request ->
+            User(
+                username = request.username,
+                password = request.password,
+                email = request.email,
+                fullName = request.fullName
+            )
+        }
+        
+        userRepository.batchInsert(users)
+        return users.map { mapToUserResponse(it) }
+    }
+
+    fun updateUserStatus(id: Long, isActive: Boolean): UserResponse {
+        if (userRepository.existsById(id) == 0) {
+            throw ResourceNotFoundException("用户不存在，ID: $id")
+        }
+        
+        userRepository.updateUserStatus(id, isActive)
+        val user = userRepository.findById(id)!!
+        return mapToUserResponse(user)
+    }
+
+    @Transactional(readOnly = true)
+    fun getUserStatistics(): Map<String, Any> {
+        val activeCount = userRepository.countUsersByStatus(true)
+        val inactiveCount = userRepository.countUsersByStatus(false)
+        val totalCount = activeCount + inactiveCount
+        
+        return mapOf(
+            "totalUsers" to totalCount,
+            "activeUsers" to activeCount,
+            "inactiveUsers" to inactiveCount,
+            "activePercentage" to if (totalCount > 0) (activeCount * 100.0 / totalCount) else 0.0
+        )
+    }
+
+    @Transactional(readOnly = true)
+    fun findUsersByIds(ids: List<Long>): List<UserResponse> {
+        return userRepository.findByIds(ids).map { mapToUserResponse(it) }
+    }
+
     private fun mapToUserResponse(user: User): UserResponse {
         return UserResponse(
             id = user.id!!,
