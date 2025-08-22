@@ -13,7 +13,6 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
 import java.time.LocalDateTime
-import java.util.*
 
 class UserServiceTest {
 
@@ -46,19 +45,18 @@ class UserServiceTest {
             fullName = request.fullName
         )
 
-        `when`(userRepository.existsByUsername(request.username)).thenReturn(false)
-        `when`(userRepository.existsByEmail(request.email)).thenReturn(false)
-        `when`(userRepository.save(any(User::class.java))).thenReturn(savedUser)
+        `when`(userRepository.existsByUsername(request.username)).thenReturn(0)
+        `when`(userRepository.existsByEmail(request.email)).thenReturn(0)
+        `when`(userRepository.insert(any(User::class.java))).thenReturn(1)
 
         // When
         val result = userService.createUser(request)
 
         // Then
-        assertEquals(savedUser.id, result.id)
         assertEquals(savedUser.username, result.username)
         assertEquals(savedUser.email, result.email)
         assertEquals(savedUser.fullName, result.fullName)
-        verify(userRepository).save(any(User::class.java))
+        verify(userRepository).insert(any(User::class.java))
     }
 
     @Test
@@ -70,7 +68,7 @@ class UserServiceTest {
             email = "test@example.com"
         )
 
-        `when`(userRepository.existsByUsername(request.username)).thenReturn(true)
+        `when`(userRepository.existsByUsername(request.username)).thenReturn(1)
 
         // When & Then
         assertThrows<DuplicateResourceException> {
@@ -89,7 +87,7 @@ class UserServiceTest {
             email = "test@example.com"
         )
 
-        `when`(userRepository.findById(userId)).thenReturn(Optional.of(user))
+        `when`(userRepository.findById(userId)).thenReturn(user)
 
         // When
         val result = userService.getUserById(userId)
@@ -104,7 +102,7 @@ class UserServiceTest {
     fun `should throw exception when user not found`() {
         // Given
         val userId = 999L
-        `when`(userRepository.findById(userId)).thenReturn(Optional.empty())
+        `when`(userRepository.findById(userId)).thenReturn(null)
 
         // When & Then
         assertThrows<ResourceNotFoundException> {

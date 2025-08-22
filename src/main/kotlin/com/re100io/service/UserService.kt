@@ -16,11 +16,11 @@ import java.time.LocalDateTime
 class UserService(private val userRepository: UserRepository) {
 
     fun createUser(request: CreateUserRequest): UserResponse {
-        if (userRepository.existsByUsername(request.username)) {
+        if (userRepository.existsByUsername(request.username) > 0) {
             throw DuplicateResourceException("用户名已存在: ${request.username}")
         }
         
-        if (userRepository.existsByEmail(request.email)) {
+        if (userRepository.existsByEmail(request.email) > 0) {
             throw DuplicateResourceException("邮箱已存在: ${request.email}")
         }
 
@@ -31,14 +31,14 @@ class UserService(private val userRepository: UserRepository) {
             fullName = request.fullName
         )
 
-        val savedUser = userRepository.save(user)
-        return mapToUserResponse(savedUser)
+        userRepository.insert(user)
+        return mapToUserResponse(user)
     }
 
     @Transactional(readOnly = true)
     fun getUserById(id: Long): UserResponse {
         val user = userRepository.findById(id)
-            .orElseThrow { ResourceNotFoundException("用户不存在，ID: $id") }
+            ?: throw ResourceNotFoundException("用户不存在，ID: $id")
         return mapToUserResponse(user)
     }
 
@@ -54,10 +54,10 @@ class UserService(private val userRepository: UserRepository) {
 
     fun updateUser(id: Long, request: UpdateUserRequest): UserResponse {
         val user = userRepository.findById(id)
-            .orElseThrow { ResourceNotFoundException("用户不存在，ID: $id") }
+            ?: throw ResourceNotFoundException("用户不存在，ID: $id")
 
         request.email?.let { email ->
-            if (userRepository.existsByEmail(email) && user.email != email) {
+            if (userRepository.existsByEmail(email) > 0 && user.email != email) {
                 throw DuplicateResourceException("邮箱已存在: $email")
             }
         }
@@ -68,12 +68,12 @@ class UserService(private val userRepository: UserRepository) {
             updatedAt = LocalDateTime.now()
         )
 
-        val savedUser = userRepository.save(updatedUser)
-        return mapToUserResponse(savedUser)
+        userRepository.update(updatedUser)
+        return mapToUserResponse(updatedUser)
     }
 
     fun deleteUser(id: Long) {
-        if (!userRepository.existsById(id)) {
+        if (userRepository.existsById(id) == 0) {
             throw ResourceNotFoundException("用户不存在，ID: $id")
         }
         userRepository.deleteById(id)

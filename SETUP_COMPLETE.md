@@ -222,7 +222,7 @@ export JAVA_HOME="/Library/Java/JavaVirtualMachines/amazon-corretto-21.jdk/Conte
 2. **API 文档**: Swagger/OpenAPI
 3. **缓存**: Redis 集成
 4. **消息队列**: RabbitMQ/Kafka
-5. **监控**: Prometheus + Grafana
+5. **监控**: 应用监控系统
 6. **日志**: ELK Stack
 
 ### 代码质量

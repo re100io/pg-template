@@ -83,4 +83,20 @@ echo "按 Ctrl+C 停止应用"
 echo ""
 echo "🚀 启动中..."
 
+# 检查端口是否被占用
+if lsof -Pi :$PORT -sTCP:LISTEN -t >/dev/null ; then
+    echo "❌ 端口 $PORT 已被占用"
+    echo "💡 请使用其他端口或停止占用该端口的进程"
+    exit 1
+fi
+
+# 启动应用
 mvn spring-boot:run -Dspring-boot.run.profiles=$PROFILE -Dspring-boot.run.arguments="--server.port=$PORT"
+
+# 检查启动结果
+if [ $? -eq 0 ]; then
+    echo "✅ 应用已成功停止"
+else
+    echo "❌ 应用启动失败"
+    exit 1
+fi

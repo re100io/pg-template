@@ -1,0 +1,178 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  JAVA_VERSION: '21'
+  MAVEN_OPTS: '-Xmx1024m'
+
+jobs:
+  test:
+    name: 测试
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pg_template_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'corretto'
+
+    - name: 缓存Maven依赖
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: 运行测试
+      run: mvn clean test
+      env:
+        SPRING_PROFILES_ACTIVE: test
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/pg_template_test
+        SPRING_DATASOURCE_USERNAME: postgres
+        SPRING_DATASOURCE_PASSWORD: postgres
+
+    - name: 生成测试报告
+      run: mvn jacoco:report
+
+    - name: 上传覆盖率报告到Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./target/site/jacoco/jacoco.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  build:
+    name: 构建
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        java-version: ${{ env.JAVA_VERSION }}
+        distribution: 'corretto'
+
+    - name: 缓存Maven依赖
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+        restore-keys: ${{ runner.os }}-m2
+
+    - name: 构建应用
+      run: mvn clean package -DskipTests
+
+    - name: 构建Docker镜像
+      run: |
+        docker build -t pg-template:${{ github.sha }} .
+        docker tag pg-template:${{ github.sha }} pg-template:latest
+
+    - name: 保存Docker镜像
+      run: docker save pg-template:latest | gzip > pg-template.tar.gz
+
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: pg-template.tar.gz
+
+  security-scan:
+    name: 安全扫描
+    runs-on: ubuntu-latest
+    needs: build
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 下载Docker镜像
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: 加载Docker镜像
+      run: docker load < pg-template.tar.gz
+
+    - name: 运行Trivy漏洞扫描
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'pg-template:latest'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+
+    - name: 上传Trivy扫描结果到GitHub Security
+      uses: github/codeql-action/upload-sarif@v3
+      if: always()
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  deploy-staging:
+    name: 部署到测试环境
+    runs-on: ubuntu-latest
+    needs: [test, build, security-scan]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 下载Docker镜像
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: 部署到测试环境
+      run: |
+        echo "部署到测试环境..."
+        # 这里添加实际的部署脚本
+        echo "部署完成"
+
+  deploy-production:
+    name: 部署到生产环境
+    runs-on: ubuntu-latest
+    needs: [test, build, security-scan]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 下载Docker镜像
+      uses: actions/download-artifact@v4
+      with:
+        name: docker-image
+
+    - name: 部署到生产环境
+      run: |
+        echo "部署到生产环境..."
+        # 这里添加实际的部署脚本
+        echo "部署完成"
