@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    image: postgres:16
+    container_name: pg-template-db
+    environment:
+      POSTGRES_DB: pg_template
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      # 创建额外的开发数据库
+      POSTGRES_MULTIPLE_DATABASES: pg_template_dev,pg_template_test
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - pg-template-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 开发环境应用
+  app-dev:
+    build: .
+    container_name: pg-template-app-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pg_template_dev
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: password
+    ports:
+      - "8080:8080"
+    networks:
+      - pg-template-network
+    profiles:
+      - dev
+
+  # 生产环境应用
+  app-prod:
+    build: .
+    container_name: pg-template-app-prod
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DATABASE_URL: jdbc:postgresql://postgres:5432/pg_template
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: password
+    ports:
+      - "8081:8080"
+    networks:
+      - pg-template-network
+    profiles:
+      - prod
+
+volumes:
+  postgres_data:
+
+networks:
+  pg-template-network:
+    driver: bridge
