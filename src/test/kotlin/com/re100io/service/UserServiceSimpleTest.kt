@@ -1,8 +1,7 @@
 package com.re100io.service
 
 import com.re100io.TestDataFactory
-import com.re100io.exception.DuplicateResourceException
-import com.re100io.exception.ResourceNotFoundException
+import com.re100io.exception.BusinessException
 import com.re100io.repository.UserRepository
 import io.mockk.*
 import org.assertj.core.api.Assertions.*
@@ -33,6 +32,7 @@ class UserServiceSimpleTest {
         every { userRepository.existsByUsername(request.username) } returns 0
         every { userRepository.existsByEmail(request.email) } returns 0
         every { userRepository.insert(any()) } returns 1
+        every { userRepository.findByUsername(request.username) } returns savedUser
 
         // When
         val result = userService.createUser(request)
@@ -54,7 +54,7 @@ class UserServiceSimpleTest {
         every { userRepository.existsByUsername(request.username) } returns 1
 
         // When & Then
-        assertThrows<DuplicateResourceException> {
+        assertThrows<BusinessException> {
             userService.createUser(request)
         }
 
@@ -87,7 +87,7 @@ class UserServiceSimpleTest {
         every { userRepository.findById(userId) } returns null
 
         // When & Then
-        assertThrows<ResourceNotFoundException> {
+        assertThrows<BusinessException> {
             userService.getUserById(userId)
         }
     }
@@ -170,7 +170,7 @@ class UserServiceSimpleTest {
         every { userRepository.existsById(userId) } returns 0
 
         // When & Then
-        assertThrows<ResourceNotFoundException> {
+        assertThrows<BusinessException> {
             userService.deleteUser(userId)
         }
 

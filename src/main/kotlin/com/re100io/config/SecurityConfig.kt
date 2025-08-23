@@ -34,6 +34,7 @@ class SecurityConfig {
                         "/api/health/**",
                         "/api/users/**",
                         "/api/examples/**",
+                        "/api/trace/**",
                         "/actuator/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",

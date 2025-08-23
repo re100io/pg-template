@@ -2,6 +2,7 @@ package com.re100io.exception
 
 import com.re100io.common.ApiCode
 import com.re100io.common.ApiResponse
+import com.re100io.common.TraceContext
 import jakarta.validation.ConstraintViolationException
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataIntegrityViolationException

@@ -1,5 +1,6 @@
 package com.re100io.service
 
+import com.re100io.common.ApiCode
 import com.re100io.dto.CreateUserRequest
 import com.re100io.dto.UpdateUserRequest
 import com.re100io.dto.UserResponse
@@ -31,7 +32,12 @@ class UserService(private val userRepository: UserRepository) {
         )
 
         userRepository.insert(user)
-        return mapToUserResponse(user)
+        
+        // 查询获取完整用户信息（包含生成的ID）
+        val savedUser = userRepository.findByUsername(user.username)
+            ?: throw BusinessException(ApiCode.USER_NOT_FOUND, "创建用户失败: ${user.username}")
+        
+        return mapToUserResponse(savedUser)
     }
 
     @Transactional(readOnly = true)
