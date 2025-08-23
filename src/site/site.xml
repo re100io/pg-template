@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 
+         http://maven.apache.org/xsd/decoration-1.8.0.xsd">
+
+    <bannerLeft>
+        <name>PG Template</name>
+        <src>images/logo.png</src>
+        <href>index.html</href>
+    </bannerLeft>
+
+    <publishDate position="right"/>
+    <version position="right"/>
+
+    <skin>
+        <groupId>org.apache.maven.skins</groupId>
+        <artifactId>maven-fluido-skin</artifactId>
+        <version>1.11.2</version>
+    </skin>
+
+    <custom>
+        <fluidoSkin>
+            <topBarEnabled>true</topBarEnabled>
+            <sideBarEnabled>true</sideBarEnabled>
+            <searchEnabled>true</searchEnabled>
+            <gitHub>
+                <projectId>re100io/pg-template</projectId>
+                <ribbonOrientation>right</ribbonOrientation>
+                <ribbonColor>darkblue</ribbonColor>
+            </gitHub>
+        </fluidoSkin>
+    </custom>
+
+    <body>
+        <menu name="项目信息">
+            <item name="项目概述" href="index.html"/>
+            <item name="项目摘要" href="project-summary.html"/>
+            <item name="依赖信息" href="dependencies.html"/>
+            <item name="插件管理" href="plugin-management.html"/>
+        </menu>
+
+        <menu name="测试报告">
+            <item name="测试覆盖率" href="jacoco-merged/index.html"/>
+            <item name="单元测试覆盖率" href="jacoco-unit/index.html"/>
+            <item name="集成测试覆盖率" href="jacoco-integration/index.html"/>
+            <item name="Surefire报告" href="surefire-report.html"/>
+            <item name="Failsafe报告" href="failsafe-report.html"/>
+        </menu>
+
+        <menu name="代码质量">
+            <item name="SpotBugs报告" href="spotbugs.html"/>
+            <item name="Checkstyle报告" href="checkstyle.html"/>
+            <item name="PMD报告" href="pmd.html"/>
+        </menu>
+
+        <menu name="文档">
+            <item name="API文档" href="apidocs/index.html"/>
+            <item name="源码交叉引用" href="xref/index.html"/>
+            <item name="测试源码交叉引用" href="xref-test/index.html"/>
+        </menu>
+
+        <breadcrumbs>
+            <item name="首页" href="index.html"/>
+        </breadcrumbs>
+    </body>
+</project>

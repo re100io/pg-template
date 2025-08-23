@@ -1,5 +1,12 @@
 # PostgreSQL Template Backend
 
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.1.0-purple)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue)
+![Coverage](https://img.shields.io/badge/Coverage-In%20Progress-yellow)
+![Tests](https://img.shields.io/badge/Tests-21%20Passing-brightgreen)
+
 基于 JDK 21、Spring Boot、MyBatis 和 PostgreSQL 的后端模板项目。
 
 ## 技术栈
@@ -9,6 +16,8 @@
 - **Kotlin**: 2.1.0
 - **数据库**: PostgreSQL
 - **构建工具**: Maven
+- **测试覆盖率**: JaCoCo
+- **代码质量**: SpotBugs, Checkstyle, PMD
 
 ## 项目结构
 
@@ -242,10 +251,44 @@ spring.datasource.password=password
 
 ## 测试
 
-运行测试：
+### 运行测试
 ```bash
+# 运行所有测试
 mvn test
+
+# 运行特定测试
+mvn test -Dtest=UserServiceTest
+
+# 运行测试并生成覆盖率报告
+./coverage-report.sh
 ```
+
+### 测试覆盖率报告
+
+项目集成了JaCoCo测试覆盖率工具，支持多种报告格式：
+
+#### 快速生成覆盖率报告
+```bash
+# 生成基本覆盖率报告
+./coverage-report.sh
+
+# 生成完整报告（包含集成测试和站点报告）
+./scripts/generate-coverage-report.sh --integration --site --open
+```
+
+#### 报告位置
+- **HTML报告**: `target/site/jacoco/index.html`
+- **XML报告**: `target/site/jacoco/jacoco.xml`
+- **CSV报告**: `target/site/jacoco/jacoco.csv`
+- **完整站点**: `target/site/index.html`
+
+#### 覆盖率阈值
+- 指令覆盖率: ≥ 70%
+- 分支覆盖率: ≥ 60%
+- 类覆盖率: ≥ 80%
+- 方法覆盖率: ≥ 75%
+
+详细使用指南请参考：[测试覆盖率报告指南](COVERAGE_REPORT_GUIDE.md)
 
 ## 构建
 
@@ -332,7 +375,8 @@ java -jar target/pg-template-1.0-SNAPSHOT.jar --spring.profiles.active=prod
 ./scripts/dev-tools.sh clean          # 清理构建文件
 ./scripts/dev-tools.sh build         # 构建项目
 ./scripts/dev-tools.sh test          # 运行测试
-./scripts/dev-tools.sh test-coverage # 测试覆盖率
+./scripts/dev-tools.sh test-coverage # 测试覆盖率报告
+./coverage-report.sh                 # 快速生成覆盖率报告
 ./scripts/dev-tools.sh api-docs      # 打开API文档
 ./scripts/dev-tools.sh metrics       # 查看应用指标
 ./scripts/dev-tools.sh logs          # 查看应用日志
