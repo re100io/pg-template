@@ -4,8 +4,7 @@ import com.re100io.dto.CreateUserRequest
 import com.re100io.dto.UpdateUserRequest
 import com.re100io.dto.UserResponse
 import com.re100io.entity.User
-import com.re100io.exception.ResourceNotFoundException
-import com.re100io.exception.DuplicateResourceException
+import com.re100io.exception.BusinessException
 import com.re100io.repository.UserRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,11 +16,11 @@ class UserService(private val userRepository: UserRepository) {
 
     fun createUser(request: CreateUserRequest): UserResponse {
         if (userRepository.existsByUsername(request.username) > 0) {
-            throw DuplicateResourceException("用户名已存在: ${request.username}")
+            throw BusinessException.usernameExists(request.username)
         }
         
         if (userRepository.existsByEmail(request.email) > 0) {
-            throw DuplicateResourceException("邮箱已存在: ${request.email}")
+            throw BusinessException.emailExists(request.email)
         }
 
         val user = User(
@@ -38,7 +37,7 @@ class UserService(private val userRepository: UserRepository) {
     @Transactional(readOnly = true)
     fun getUserById(id: Long): UserResponse {
         val user = userRepository.findById(id)
-            ?: throw ResourceNotFoundException("用户不存在，ID: $id")
+            ?: throw BusinessException.userNotFound(id)
         return mapToUserResponse(user)
     }
 
@@ -54,11 +53,11 @@ class UserService(private val userRepository: UserRepository) {
 
     fun updateUser(id: Long, request: UpdateUserRequest): UserResponse {
         val user = userRepository.findById(id)
-            ?: throw ResourceNotFoundException("用户不存在，ID: $id")
+            ?: throw BusinessException.userNotFound(id)
 
         request.email?.let { email ->
             if (userRepository.existsByEmail(email) > 0 && user.email != email) {
-                throw DuplicateResourceException("邮箱已存在: $email")
+                throw BusinessException.emailExists(email)
             }
         }
 
@@ -74,7 +73,7 @@ class UserService(private val userRepository: UserRepository) {
 
     fun deleteUser(id: Long) {
         if (userRepository.existsById(id) == 0) {
-            throw ResourceNotFoundException("用户不存在，ID: $id")
+            throw BusinessException.userNotFound(id)
         }
         userRepository.deleteById(id)
     }
@@ -114,7 +113,7 @@ class UserService(private val userRepository: UserRepository) {
 
     fun updateUserStatus(id: Long, isActive: Boolean): UserResponse {
         if (userRepository.existsById(id) == 0) {
-            throw ResourceNotFoundException("用户不存在，ID: $id")
+            throw BusinessException.userNotFound(id)
         }
         
         userRepository.updateUserStatus(id, isActive)

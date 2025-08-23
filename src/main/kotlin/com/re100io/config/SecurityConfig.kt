@@ -31,12 +31,13 @@ class SecurityConfig {
                 auth
                     // 公开端点
                     .requestMatchers(
-                        "/health/**",
+                        "/api/health/**",
+                        "/api/users/**",
+                        "/api/examples/**",
                         "/actuator/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**",
-                        "/swagger-ui.html",
-                        "/users/**" // 暂时开放用户API用于开发测试
+                        "/swagger-ui.html"
                     ).permitAll()
                     // 其他端点需要认证
                     .anyRequest().authenticated()

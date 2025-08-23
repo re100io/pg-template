@@ -1,6 +1,6 @@
 package com.re100io.controller
 
-import com.re100io.dto.ApiResponse
+import com.re100io.common.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import javax.sql.DataSource
 
 @RestController
-@RequestMapping("/health")
+@RequestMapping("/api/health")
 @Tag(name = "健康检查", description = "应用健康状态检查接口")
 class HealthController {
 
@@ -44,7 +44,7 @@ class HealthController {
         }
 
         return ResponseEntity.ok(
-            ApiResponse(true, "健康检查完成", healthData)
+            ApiResponse.success(healthData, "健康检查完成")
         )
     }
 
@@ -56,18 +56,18 @@ class HealthController {
             dataSource.connection.use { connection ->
                 if (connection.isValid(5)) {
                     return ResponseEntity.ok(
-                        ApiResponse(true, "应用已就绪", mapOf("status" to "READY"))
+                        ApiResponse.success(mapOf("status" to "READY"), "应用已就绪")
                     )
                 }
             }
         } catch (e: Exception) {
             return ResponseEntity.status(503).body(
-                ApiResponse(false, "应用未就绪: ${e.message}", mapOf("status" to "NOT_READY"))
+                ApiResponse.error<Map<String, String>>("应用未就绪: ${e.message}")
             )
         }
 
         return ResponseEntity.status(503).body(
-            ApiResponse(false, "应用未就绪", mapOf("status" to "NOT_READY"))
+            ApiResponse.error<Map<String, String>>("应用未就绪")
         )
     }
 
@@ -75,7 +75,7 @@ class HealthController {
     @Operation(summary = "存活检查", description = "检查应用是否存活")
     fun liveness(): ResponseEntity<ApiResponse<Map<String, String>>> {
         return ResponseEntity.ok(
-            ApiResponse(true, "应用存活", mapOf("status" to "ALIVE"))
+            ApiResponse.success(mapOf("status" to "ALIVE"), "应用存活")
         )
     }
 }

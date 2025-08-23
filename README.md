@@ -62,12 +62,36 @@ CREATE DATABASE pg_template_dev;
 
 ### 4. 快速启动
 
-#### 方式一：使用启动脚本（推荐）
+#### 开发环境
 ```bash
+# 使用启动脚本（推荐）
 ./start.sh
+
+# 或手动启动（包含DEBUG日志）
+mvn spring-boot:run -Pdev
 ```
 
-#### 方式二：手动启动
+#### 生产环境
+```bash
+# 构建release版本
+./scripts/build-release.sh
+
+# 运行生产版本（去掉DEBUG日志）
+java -jar target/pg-template-1.0-SNAPSHOT.jar --spring.profiles.active=prod
+
+# 或使用启动脚本
+./scripts/start.sh prod 7001
+```
+
+#### Docker部署
+```bash
+# 构建并部署
+./scripts/deploy.sh prod
+
+# 或手动构建
+docker build -t pg-template:latest .
+docker-compose -f docker-compose.prod.yml up -d
+```
 
 1. **启动数据库**（使用 Docker）：
 ```bash
@@ -87,22 +111,67 @@ java -jar target/pg-template-1.0-SNAPSHOT.jar --spring.profiles.active=prod
 
 ### 4. API 端点
 
-基础路径: `http://localhost:8080/api`
+基础路径: `http://localhost:7001`
 
 #### 用户管理 API
 
-- `POST /users` - 创建用户
-- `GET /users/{id}` - 获取用户详情
-- `GET /users` - 获取用户列表
-- `PUT /users/{id}` - 更新用户
-- `DELETE /users/{id}` - 删除用户
-- `GET /users/search?keyword=xxx` - 搜索用户
+| 方法 | 路径 | 功能 |
+|------|------|------|
+| POST | `/api/users` | 创建用户 |
+| GET | `/api/users/{id}` | 获取用户详情 |
+| PUT | `/api/users/{id}` | 更新用户信息 |
+| DELETE | `/api/users/{id}` | 删除用户 |
+| GET | `/api/users` | 获取用户列表 |
+| GET | `/api/users/active` | 获取活跃用户 |
+| GET | `/api/users/search?keyword=xxx` | 搜索用户 |
+| GET | `/api/users/advanced-search` | 高级搜索用户 |
+| POST | `/api/users/batch` | 批量创建用户 |
+| PATCH | `/api/users/{id}/status` | 更新用户状态 |
+| GET | `/api/users/statistics` | 获取用户统计 |
+| POST | `/api/users/by-ids` | 批量获取用户 |
+| GET | `/api/users/statistics/dashboard` | 用户数据仪表板 |
+| GET | `/api/users/statistics/registration-trend` | 注册趋势分析 |
+| GET | `/api/users/statistics/activity-analysis` | 活跃度分析 |
+| GET | `/api/users/statistics/email-domains` | 邮箱域名分布 |
+| PATCH | `/api/users/statistics/batch-status` | 批量状态更新 |
+| GET | `/api/actuator/health` | 健康检查 |
+| GET | `/swagger-ui.html` | API文档界面 |
+
+## 🎯 统一响应结构
+
+项目实现了统一的API响应结构，所有接口都返回标准格式：
+
+```json
+{
+  "success": true,
+  "code": 200,
+  "message": "操作成功",
+  "data": { ... },
+  "timestamp": "2024-01-01T12:00:00"
+}
+```
+
+### 示例API测试
+
+```bash
+# 健康检查
+curl http://localhost:7001/api/health
+
+# 成功响应示例
+curl http://localhost:7001/api/examples/success
+
+# 分页响应示例
+curl http://localhost:7001/api/examples/page
+
+# 错误响应示例
+curl http://localhost:7001/api/examples/business-error
+```
 
 #### 示例请求
 
 创建用户：
 ```bash
-curl -X POST http://localhost:8080/api/users \
+curl -X POST http://localhost:7001/api/users \
   -H "Content-Type: application/json" \
   -d '{
     "username": "testuser",
@@ -110,6 +179,48 @@ curl -X POST http://localhost:8080/api/users \
     "email": "test@example.com",
     "fullName": "Test User"
   }'
+```
+
+## Release构建
+
+### 构建Release包
+```bash
+# 自动化构建（推荐）
+./scripts/build-release.sh
+
+# 手动构建
+mvn clean package -Prelease
+```
+
+### 构建产物
+- `pg-template-1.0-SNAPSHOT.jar` - 可执行JAR包
+- `pg-template-1.0-SNAPSHOT-sources.jar` - 源码包
+- `pg-template-1.0-SNAPSHOT.tar.gz` - Linux/Unix分发包
+- `pg-template-1.0-SNAPSHOT.zip` - Windows分发包
+
+### 日志级别对比
+**开发环境** (包含DEBUG日志):
+```
+DEBUG com.re100io.MainKt - Running with Spring Boot v3.4.1, Spring v6.2.1
+INFO  com.re100io.MainKt - The following 1 profile is active: "dev"
+```
+
+**生产环境** (去掉DEBUG日志):
+```
+INFO  com.re100io.MainKt - Starting MainKt using Java 21.0.6 with PID 93207
+INFO  com.re100io.MainKt - The following 1 profile is active: "prod"
+```
+
+### Docker部署
+```bash
+# 一键部署
+./scripts/deploy.sh prod
+
+# 查看部署状态
+docker-compose -f docker-compose.prod.yml ps
+
+# 查看日志
+docker-compose -f docker-compose.prod.yml logs -f app
 ```
 
 ## 配置说明
