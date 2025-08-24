@@ -1,0 +1,19 @@
+${AnsiColor.BRIGHT_BLUE}
+ ██████╗ ██████╗  ██████╗ ██████╗ 
+ ██╔══██╗██╔══██╗██╔═══██╗██╔══██╗
+ ██████╔╝██████╔╝██║   ██║██║  ██║
+ ██╔═══╝ ██╔══██╗██║   ██║██║  ██║
+ ██║     ██║  ██║╚██████╔╝██████╔╝
+ ╚═╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ 
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_RED}🚀 PRODUCTION MODE 🚀${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}:: ${spring.application.name} ::${AnsiColor.DEFAULT}        ${AnsiColor.BRIGHT_GREEN}v${application.version}${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_BLUE}:: Spring Boot ${spring-boot.version} | JDK ${java.version} ::${AnsiColor.DEFAULT}
+
+${AnsiColor.BRIGHT_WHITE}🛡️  Production Ready:${AnsiColor.DEFAULT}
+   ${AnsiColor.GREEN}✅${AnsiColor.DEFAULT} Optimized performance & security
+   ${AnsiColor.GREEN}✅${AnsiColor.DEFAULT} Structured logging & monitoring
+   ${AnsiColor.GREEN}✅${AnsiColor.DEFAULT} Health checks & metrics enabled
+   ${AnsiColor.GREEN}✅${AnsiColor.DEFAULT} Database connection pooling
+
+${AnsiColor.BRIGHT_WHITE}Service Status:${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_GREEN}ONLINE${AnsiColor.DEFAULT} | Port: ${AnsiColor.BRIGHT_YELLOW}${server.port}${AnsiColor.DEFAULT}

@@ -1,0 +1,26 @@
+${AnsiColor.BRIGHT_GREEN}
+ ██████╗ ███████╗██╗   ██╗    ███╗   ███╗ ██████╗ ██████╗ ███████╗
+ ██╔══██╗██╔════╝██║   ██║    ████╗ ████║██╔═══██╗██╔══██╗██╔════╝
+ ██║  ██║█████╗  ██║   ██║    ██╔████╔██║██║   ██║██║  ██║█████╗  
+ ██║  ██║██╔══╝  ╚██╗ ██╔╝    ██║╚██╔╝██║██║   ██║██║  ██║██╔══╝  
+ ██████╔╝███████╗ ╚████╔╝     ██║ ╚═╝ ██║╚██████╔╝██████╔╝███████╗
+ ╚═════╝ ╚══════╝  ╚═══╝      ╚═╝     ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_YELLOW}🔧 DEVELOPMENT MODE 🔧${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_CYAN}:: ${spring.application.name} ::${AnsiColor.DEFAULT}        ${AnsiColor.BRIGHT_YELLOW}v${application.version}${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_BLUE}:: Spring Boot ${spring-boot.version} | Kotlin ${kotlin.version} | JDK ${java.version} ::${AnsiColor.DEFAULT}
+
+${AnsiColor.BRIGHT_WHITE}🛠️  Development Features:${AnsiColor.DEFAULT}
+   ${AnsiColor.YELLOW}🔥${AnsiColor.DEFAULT} Hot reload & live debugging enabled
+   ${AnsiColor.YELLOW}📝${AnsiColor.DEFAULT} Detailed logging & SQL tracing
+   ${AnsiColor.YELLOW}🧪${AnsiColor.DEFAULT} Test endpoints & mock data available
+   ${AnsiColor.YELLOW}🔍${AnsiColor.DEFAULT} H2 console & database inspection tools
+   ${AnsiColor.YELLOW}⚡${AnsiColor.DEFAULT} Fast startup & development optimizations
+
+${AnsiColor.BRIGHT_WHITE}🌐 Development Links:${AnsiColor.DEFAULT}
+   ${AnsiColor.CYAN}📋 Swagger UI:${AnsiColor.DEFAULT}      ${AnsiColor.BRIGHT_CYAN}http://localhost:${server.port}/swagger-ui.html${AnsiColor.DEFAULT}
+   ${AnsiColor.CYAN}❤️  Health Check:${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_CYAN}http://localhost:${server.port}/actuator/health${AnsiColor.DEFAULT}
+   ${AnsiColor.CYAN}🔍 Trace Testing:${AnsiColor.DEFAULT}   ${AnsiColor.BRIGHT_CYAN}http://localhost:${server.port}/api/trace/test${AnsiColor.DEFAULT}
+   ${AnsiColor.CYAN}📊 Coverage Report:${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_CYAN}./coverage-report.sh${AnsiColor.DEFAULT}
+
+${AnsiColor.BRIGHT_YELLOW}⚠️  Development Environment Active ⚠️${AnsiColor.DEFAULT}
